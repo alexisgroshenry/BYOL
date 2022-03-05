@@ -6,23 +6,22 @@ import torch.optim as optim
 from tqdm import tqdm
 
 from utils import init_model, init_optim, save_list_to_file
-from data import data_transforms_online, data_transforms_target, ImageFolderLoader
+from data import data_transforms_online, data_transforms_target
+from image_loader import ImageFolderLoader
 
 
 # Training settings
-parser = argparse.ArgumentParser(description='RecVis A3 training script')
-parser.add_argument('--data', type=str, default='bird_dataset', metavar='D',
-                    help="folder where data is located. train_images/ and val_images/ need to be found in the folder")
+parser = argparse.ArgumentParser()
 parser.add_argument('--batch-size', type=int, default=4096, metavar='B',
-                    help='input batch size for training (default: 64)')
+                    help='input batch size for training (default: 4096)')
 parser.add_argument('--epochs', type=int, default=10, metavar='N',
                     help='number of epochs to train (default: 10)')
-parser.add_argument('--resnet_size', type=int, default=152, metavar='S',
-                    help='size of the resnet model in [18, 50, 152] (default: 152)')
+parser.add_argument('--resnet_size', type=int, default=101, metavar='S',
+                    help='size of the resnet model (default: 152)')
 parser.add_argument('--pretrained', type=bool, default=True, metavar='PTR',
                     help='whether to use pretrained weights on ImageNet (default: True)')
 parser.add_argument('--train_last_layer', type=bool, default=True, metavar='TLL',
-                    help='whether to train the lasst convolutional layers of the network (default: True)')
+                    help='whether to train the last convolutional layers of the network (default: True)')
 parser.add_argument('--lr', type=float, default=0.2, metavar='LR',
                     help='learning rate (default: 0.01)')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
@@ -38,8 +37,17 @@ if not os.path.isdir(args.experiment):
     os.makedirs(args.experiment)
 
 
-online_model = init_model(args, mode='online')
-target_model = init_model(args, mode='target')
+image_datasets = ImageFolderLoader(data_transforms_online, data_transforms_target)
+train_loader = torch.utils.data.DataLoader(
+    image_datasets,
+    batch_size=args.batch_size,
+    shuffle=True,
+    num_workers=0
+)
+
+num_classes = len(image_datasets.classes)
+online_model = init_model(args, num_classes, mode='online')
+target_model = init_model(args, num_classes, mode='target')
 if use_cuda:
     print('Using GPU')
     online_model.cuda()
@@ -52,10 +60,6 @@ train_loss = []
 optimizer = init_optim(args, online_model)
 tau0 = 0.996
 
-image_datasets = ImageFolderLoader(args.data, data_transforms_online, data_transforms_target)
-train_loader = torch.utils.data.DataLoader(
-        image_datasets, batch_size=args.batch_size,
-        shuffle=True, num_workers=0)
 
 def train(epoch):
     total_loss = 0.

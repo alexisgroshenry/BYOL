@@ -39,10 +39,7 @@ def set_parameter_requires_grad(model, train_last_layer = False):
 
 
 def ResNet(size=152, pretrained=True, train_last_layer=True, mode='classif', num_classes=20):
-    if size==50:
-        model = models.resnet50(pretrained)
-    elif size==152:
-        model = models.resnet152(pretrained)
+    model = eval('models.resnet' + str(size))(pretrained)
 
     set_parameter_requires_grad(model, train_last_layer)
 

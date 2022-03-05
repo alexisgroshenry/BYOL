@@ -3,8 +3,6 @@ import torch.optim as optim
 
 from model import ResNet
 
-
-
 def init_model(args, num_classes=20, mode='classif'):
     '''
     Initialize model architecture
