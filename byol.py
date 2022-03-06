@@ -17,12 +17,12 @@ parser.add_argument('--batch-size', type=int, default=4096, metavar='B',
 parser.add_argument('--epochs', type=int, default=10, metavar='N',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--resnet_size', type=int, default=101, metavar='S',
-                    help='size of the resnet model (default: 152)')
+                    help='size of the resnet model (default: 101)')
 parser.add_argument('--pretrained', type=bool, default=True, metavar='PTR',
                     help='whether to use pretrained weights on ImageNet (default: True)')
 parser.add_argument('--train_last_layer', type=bool, default=True, metavar='TLL',
                     help='whether to train the last convolutional layers of the network (default: True)')
-parser.add_argument('--lr', type=float, default=0.2, metavar='LR',
+parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                     help='learning rate (default: 0.01)')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
@@ -115,12 +115,11 @@ lr_scheduler     = optim.lr_scheduler.SequentialLR(optimizer,
 
 for epoch in range(1, args.epochs + 1):
     train(epoch)
-    if epoch==1:
-        best_loss = train_loss[-1]
     if epoch==1 or train_loss[-1] < best_loss:
         print('New best_loss, saving model')
         model_file = args.experiment + '/best_model.pth'
         torch.save(online_model.state_dict(), model_file)
+        best_loss = train_loss[-1]
 
 print('Saving last model')
 model_file = args.experiment + '/last_model.pth'

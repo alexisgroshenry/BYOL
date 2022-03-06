@@ -1,4 +1,5 @@
-import torch.utils.data as data
+import torch
+import torch.utils.data as data_utils
 from torchvision.datasets.cifar import CIFAR10
 from PIL import Image
 
@@ -7,7 +8,32 @@ def find_classes(classes):
     class_to_idx = {classes[i]: i for i in range(len(classes))}
     return classes, class_to_idx
 
-class ImageFolderLoader(data.Dataset):
+
+def create_dataloaders(batch_size=10, train_transform=None, test_transform=None):
+    # load datasets
+    train_cifar = CIFAR10('cifar', train=True, download=True, transform=train_transform)
+    test_set = CIFAR10('cifar', train=False, download=True, transform=test_transform)
+
+    # define indices of labeled and unlabeled training images
+    label_indices = torch.arange(100)
+    
+    # create the corresponding datasets
+    train_set = data_utils.Subset(train_cifar, label_indices)
+
+    # create the dataaloaders
+    train_loader = torch.utils.data.DataLoader(train_set,
+                                              batch_size=batch_size,
+                                              shuffle=True,
+                                              num_workers=1)
+    test_loader = torch.utils.data.DataLoader(test_set,
+                                              batch_size=batch_size,
+                                              shuffle=False,
+                                              num_workers=1)
+    return train_loader, test_loader
+
+
+
+class ImageFolderLoader(data_utils.Dataset):
     '''
     Define customized class to load the same image with two different transformations
     '''
