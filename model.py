@@ -38,10 +38,11 @@ def set_parameter_requires_grad(model, train_last_layer = False):
             param.requires_grad = True
 
 
-def ResNet(size=152, pretrained=True, train_last_layer=True, mode='classif', num_classes=20):
+def ResNet(size=152, pretrained=True, freeze=True, train_last_layer=True, mode='classif', num_classes=20):
     model = eval('models.resnet' + str(size))(pretrained)
 
-    set_parameter_requires_grad(model, train_last_layer)
+    if freeze:
+        set_parameter_requires_grad(model, train_last_layer)
 
     # model used for classification
     if mode=='classif':

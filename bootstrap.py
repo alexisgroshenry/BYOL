@@ -18,6 +18,8 @@ parser.add_argument('--resnet_size', type=int, default=101, metavar='S',
                     help='size of the resnet model (default: 101)')
 parser.add_argument('--pretrained', type=bool, default=False, metavar='PTR',
                     help='whether to use pretrained weights on ImageNet (default: False)')
+parser.add_argument('--freeze', type=bool, default=True, metavar='FRZ',
+                    help='whether to freeze the weights (default: True)')
 parser.add_argument('--train_last_layer', type=bool, default=False, metavar='TLL',
                     help='whether to train the last convolutional layers of the network (default: False)')
 parser.add_argument('--lr', type=float, default=0.01, metavar='LR',

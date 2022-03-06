@@ -7,7 +7,14 @@ def init_model(args, num_classes=20, mode='classif'):
     '''
     Initialize model architecture
     '''
-    return ResNet(args.resnet_size, pretrained=args.pretrained, train_last_layer=args.train_last_layer, mode=mode, num_classes=num_classes)
+    return ResNet(
+        args.resnet_size,
+        pretrained=args.pretrained,
+        freeze=args.freeze,
+        train_last_layer=args.train_last_layer,
+        mode=mode,
+        num_classes=num_classes
+    )
 
 
 def load_weights(path, model):
